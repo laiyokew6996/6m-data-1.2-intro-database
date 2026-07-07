@@ -300,7 +300,7 @@ Split into three tables so each fact lives with its natural identifier:
 | 2 | S01 | B20 | 2026-01-12 |
 | 3 | S02 | B10 | 2026-01-08 |
 
-Now changing Alice's name means updating **one cell** in the Students table — not three rows.
+Now changing Alice's name means updating **one cell** in the Students table — not two rows.
 
 ---
 
@@ -343,7 +343,7 @@ Work through the normalization steps with your group:
 
 **Step 2 — Apply 2NF:** Customer info (CustomerID, CustomerName, OrderDate) depends only on OrderID, not on LineNumber. Split into an **Orders Table** and an **Order Line Items Table**.
 
-**Step 3 — Apply 3NF:** ItemName and ItemPrice depend on ItemID, not on the specific order. Create a separate **Products Table**.
+**Step 3 — Apply 3NF:** ItemName and ItemPrice depend on ItemID, not on the specific order — create a separate **Products Table**. The same problem exists for CustomerName: it depends on CustomerID, not on OrderID, so it also needs its own **Customers Table**.
 
 **Final Result — 4 clean tables:** Customers, Products, Orders, Order Line Items.
 

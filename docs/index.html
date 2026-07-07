@@ -938,12 +938,32 @@
                 <div class="step-header">
                     <span class="step-badge badge-3nf">3NF</span>
                     <h2 class="step-title">Transitive Dependency Problem</h2>
-                    <p class="step-description">In OrderLineItems, ItemName and ItemPrice depend on ItemID, not on the order!</p>
+                    <p class="step-description">CustomerName depends on CustomerID, and ItemName/ItemPrice depend on ItemID — not on the order itself!</p>
                 </div>
                 <div class="step-content">
                     <div class="legend">
                         <div class="legend-item"><div class="legend-color legend-pk"></div> Primary Key</div>
-                        <div class="legend-item"><div class="legend-color legend-problem"></div> Transitive Dependency (depends on ItemID)</div>
+                        <div class="legend-item"><div class="legend-color legend-problem"></div> Transitive Dependency</div>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <div class="table-title">Orders - Spot the Problem</div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>OrderID</th>
+                                        <th>CustomerID</th>
+                                        <th style="background: var(--problem);">CustomerName</th>
+                                        <th>OrderDate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td class="pk">100</td><td>1</td><td class="problem">John</td><td>2021-01-01</td></tr>
+                                    <tr><td class="pk">200</td><td>1</td><td class="problem">John</td><td>2021-01-02</td></tr>
+                                    <tr><td class="pk">300</td><td>2</td><td class="problem">Mary</td><td>2021-01-03</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="table-container">
                         <div class="table-wrapper">
@@ -989,8 +1009,8 @@
                         </div>
                     </div>
                     <div class="key-message">
-                        "iPhone" and "1000" are facts about Item 10, not about this specific order line!<br>
-                        If iPhone's price changes, we'd have to update EVERY row.
+                        "John" is a fact about Customer 1, and "iPhone"/"1000" are facts about Item 10 — neither is about the order itself!<br>
+                        If John changes his name, or iPhone's price changes, we'd have to update EVERY row.
                     </div>
                 </div>
             </div>
@@ -1000,7 +1020,7 @@
                 <div class="step-header">
                     <span class="step-badge badge-3nf">3NF</span>
                     <h2 class="step-title">Final Normalized Schema</h2>
-                    <p class="step-description">Extract Items into their own table. Each fact is now stored in exactly ONE place!</p>
+                    <p class="step-description">Extract Customers and Items into their own tables. Each fact is now stored in exactly ONE place!</p>
                 </div>
                 <div class="step-content">
                     <div class="legend">
@@ -1012,16 +1032,31 @@
                             <div class="table-wrapper success-glow slide-in-left">
                                 <div class="table-title">
                                     <span class="icon" style="background: var(--success); color: white;">&#10003;</span>
+                                    Customers
+                                </div>
+                                <table>
+                                    <thead>
+                                        <tr><th>CustomerID</th><th>CustomerName</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="pk">1</td><td>John</td></tr>
+                                        <tr><td class="pk">2</td><td>Mary</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table-wrapper success-glow slide-in-right">
+                                <div class="table-title">
+                                    <span class="icon" style="background: var(--success); color: white;">&#10003;</span>
                                     Orders
                                 </div>
                                 <table>
                                     <thead>
-                                        <tr><th>OrderID</th><th>CustomerID</th><th>CustomerName</th><th>OrderDate</th></tr>
+                                        <tr><th>OrderID</th><th>CustomerID</th><th>OrderDate</th></tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td class="pk">100</td><td>1</td><td>John</td><td>2021-01-01</td></tr>
-                                        <tr><td class="pk">200</td><td>1</td><td>John</td><td>2021-01-02</td></tr>
-                                        <tr><td class="pk">300</td><td>2</td><td>Mary</td><td>2021-01-03</td></tr>
+                                        <tr><td class="pk">100</td><td class="fk">1</td><td>2021-01-01</td></tr>
+                                        <tr><td class="pk">200</td><td class="fk">1</td><td>2021-01-02</td></tr>
+                                        <tr><td class="pk">300</td><td class="fk">2</td><td>2021-01-03</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -1064,7 +1099,7 @@
                         </div>
                     </div>
                     <div class="key-message" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
-                        Each fact is stored in exactly ONE place! Change iPhone's price once, it updates everywhere.
+                        Each fact is stored in exactly ONE place! Change John's name or iPhone's price once, and it updates everywhere.
                     </div>
                 </div>
             </div>

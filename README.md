@@ -8,9 +8,11 @@
 
 | Section | Duration | Topic / Activity |
 |---------|----------|-----------------|
-| **Part 1: The Data Landscape** | 55 min | Relational vs. NoSQL vs. Vector Databases; SQL Data Types |
-| **Part 2: Building the Blueprint** | 55 min | Primary & Foreign Keys; Entity-Relationship Diagrams (ERD) |
-| **Part 3: Organising Data** | 55 min | Database Normalisation — 1NF, 2NF, and 3NF |
+| **Part 1: The Data Landscape** | 50 min | Relational vs. NoSQL vs. Vector Databases; SQL Data Types |
+| **Part 2: Building the Blueprint** | 50 min | Primary & Foreign Keys; Entity-Relationship Diagrams (ERD) |
+| **Part 3: Organising Data** | 50 min | Database Normalisation — 1NF, 2NF, and 3NF |
+
+*(Plus two 10-min breaks between parts — see [Lesson Plan](./lesson.md) for the full agenda, totalling 3 hours.)*
 
 ---
 

@@ -123,7 +123,7 @@ Table users {
 
 // 1. One User has Many Addresses
 Table addresses {
-  id int [pk]
+  id int [pk, increment]
   user_id int
   street varchar
   city varchar
@@ -131,27 +131,27 @@ Table addresses {
 }
 
 Table restaurants {
-  id int [pk]
+  id int [pk, increment]
   name varchar
   cuisine varchar
   rating decimal // Added rating as per requirements
 }
 
 Table menu_items {
-  id int [pk]
+  id int [pk, increment]
   restaurant_id int
   name varchar
   current_price decimal // This is the price TODAY
 }
 
 Table couriers {
-  id int [pk]
+  id int [pk, increment]
   name varchar
   vehicle varchar
 }
 
 Table orders {
-  id int [pk]
+  id int [pk, increment]
   user_id int
   courier_id int
   restaurant_id int
@@ -161,7 +161,7 @@ Table orders {
 
 // THE JUNCTION TABLE (Many-to-Many Resolver)
 Table order_items {
-  id int [pk]
+  id int [pk, increment]
   order_id int
   menu_item_id int
   quantity int      // How many did they buy?
