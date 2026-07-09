@@ -88,6 +88,8 @@ Apply the concepts of Primary Keys and Foreign Keys to create a logical Entity-R
 
 Before we write SQL queries, we need a map. An Architect draws a blueprint before the construction crew lays bricks. An **ERD (Entity Relationship Diagram)** is our blueprint.
 
+![Drawing an ERD in dbdiagram.io](assets/dbdiagram.gif)
+
 The glue that holds this blueprint together is the **ID**.
 
 **The Keys:**
@@ -103,6 +105,8 @@ The glue that holds this blueprint together is the **ID**.
 - Words like `int` and `varchar` simply say what kind of value a column holds (a whole number, a short piece of text).
 - `[pk, increment]` means "this column is the Primary Key, and the database numbers the rows automatically 1, 2, 3…" — you never type the IDs yourself.
 - `Ref: cars.customer_id > customers.id` draws the arrow between two tables. Read the `>` as "many cars belong to one customer."
+
+For more information on DBML, see the [DBML Reference](https://www.dbml.org/docs/).
 
 ### 🛠️ Activity 2.1: Code-Along — Car Insurance Schema (15 min)
 
