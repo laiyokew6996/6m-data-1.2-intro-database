@@ -255,7 +255,7 @@ One reassurance before we dive in: **you don't need to memorise the 1NF/2NF/3NF 
 
 ---
 
-#### Rule 1 (1NF): One Item Per Space — "No Grocery Bags in Cells"
+#### Rule 1 (1NF): One Item Per Space with Unique Rows — "No Grocery Bags in Cells"
 
 **The Problem — Before 1NF:**
 
@@ -266,13 +266,17 @@ One reassurance before we dive in: **you don't need to memorise the 1NF/2NF/3NF 
 
 **The Solution — After 1NF:**
 
-| Person | Favorite Fruit |
-|--------|----------------|
-| Sarah | Apple |
-| Sarah | Banana |
-| Sarah | Orange |
-| Mike | Grape |
-| Mike | Mango |
+Splitting the list into one fruit per row isn't enough on its own — notice "Sarah" now appears three times. We need a Primary Key so every row is individually identifiable:
+
+| ID | Person | Favorite Fruit |
+|----|--------|----------------|
+| 1 | Sarah | Apple |
+| 2 | Sarah | Banana |
+| 3 | Sarah | Orange |
+| 4 | Mike | Grape |
+| 5 | Mike | Mango |
+
+1NF is two rules, not one: **(1) atomic values** — one fruit per cell, no lists — **and (2) unique rows** — the `ID` column above. A table can fix rule 1 and still fail 1NF if it has no way to uniquely identify each row.
 
 ---
 
