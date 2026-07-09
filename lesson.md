@@ -255,42 +255,47 @@ One reassurance before we dive in: **you don't need to memorise the 1NF/2NF/3NF 
 
 ---
 
+We'll follow one story — a university **Library Borrow Log** — through all three rules, so you can see how each fix sets up the next problem.
+
 #### Rule 1 (1NF): One Item Per Space with Unique Rows — "No Grocery Bags in Cells"
 
 **The Problem — Before 1NF:**
 
-| Person | Favorite Fruits |
-|--------|-----------------|
-| Sarah | Apple, Banana, Orange |
-| Mike | Grape, Mango |
+| StudentID | StudentName | Books Borrowed |
+|-----------|-------------|-----------------|
+| S01 | Alice | Dune, 1984 |
+| S02 | Bob | Dune |
 
 **The Solution — After 1NF:**
 
-Splitting the list into one fruit per row isn't enough on its own — notice "Sarah" now appears three times. We need a Primary Key so every row is individually identifiable:
+Splitting the list into one book per row isn't enough on its own — notice Alice's row now repeats, and `StudentID` alone can't tell those two rows apart. But we don't need to invent a new column: assuming a student only borrows a given book once at a time, the *pair* `(StudentID, BookID)` is already unique together. That pair becomes our **composite Primary Key**:
 
-| ID | Person | Favorite Fruit |
-|----|--------|----------------|
-| 1 | Sarah | Apple |
-| 2 | Sarah | Banana |
-| 3 | Sarah | Orange |
-| 4 | Mike | Grape |
-| 5 | Mike | Mango |
+| StudentID | StudentName | BookID | BookTitle | BorrowDate |
+|-----------|-------------|--------|-----------|------------|
+| S01 | Alice | B10 | Dune | 2026-01-05 |
+| S01 | Alice | B20 | 1984 | 2026-01-12 |
+| S02 | Bob | B10 | Dune | 2026-01-08 |
 
-1NF is two rules, not one: **(1) atomic values** — one fruit per cell, no lists — **and (2) unique rows** — the `ID` column above. A table can fix rule 1 and still fail 1NF if it has no way to uniquely identify each row.
+1NF is two rules, not one: **(1) atomic values** — one book per cell, no lists — **and (2) unique rows**, here guaranteed by the composite key `(StudentID, BookID)`. A table can fix rule 1 and still fail 1NF if it has no way to uniquely identify each row. *(Sometimes the existing columns aren't enough and you do need a new surrogate ID column instead — that's a design choice, not a requirement.)*
 
 ---
 
 #### Rule 2 (2NF): Everything Relates to the Complete ID — "The Address Book Rule"
 
-**The Problem — Before 2NF:**
+**The Problem — Starting from the 1NF table above:**
 
-| BorrowID | StudentID | StudentName | BookID | BookTitle | BorrowDate |
-|----------|-----------|-------------|--------|-----------|------------|
-| 1 | S01 | Alice | B10 | Dune | 2026-01-05 |
-| 2 | S01 | Alice | B20 | 1984 | 2026-01-12 |
-| 3 | S02 | Bob | B10 | Dune | 2026-01-08 |
+| StudentID | StudentName | BookID | BookTitle | BorrowDate |
+|-----------|-------------|--------|-----------|------------|
+| S01 | Alice | B10 | Dune | 2026-01-05 |
+| S01 | Alice | B20 | 1984 | 2026-01-12 |
+| S02 | Bob | B10 | Dune | 2026-01-08 |
 
-Two problems here: Alice's name is repeated across rows (if she changes her name, every row needs updating). And "Dune" appears twice — BookTitle depends on BookID, not on who borrowed it or when.
+The Primary Key here is the **whole pair** `(StudentID, BookID)` — there is no other ID column. But look at the other two columns:
+
+- `StudentName` depends only on `StudentID` — the `BookID` half of the key is irrelevant to it.
+- `BookTitle` depends only on `BookID` — the `StudentID` half of the key is irrelevant to it.
+
+Neither column depends on the *whole* key — only on half of it. That's a **partial dependency**, and it's exactly what 2NF forbids: 2NF only ever comes up when the key has more than one column, because "part of the key" only means something if the key has parts. The symptom is redundancy: Alice's name is repeated across rows (if she changes her name, every row needs updating), and "Dune" appears twice for the same reason.
 
 **The Solution — After 2NF:**
 
@@ -306,38 +311,53 @@ Split into three tables so each fact lives with its natural identifier:
 | B10 | Dune |
 | B20 | 1984 |
 
-| BorrowID | StudentID | BookID | BorrowDate |
-|----------|-----------|--------|------------|
-| 1 | S01 | B10 | 2026-01-05 |
-| 2 | S01 | B20 | 2026-01-12 |
-| 3 | S02 | B10 | 2026-01-08 |
+| StudentID | BookID | BorrowDate |
+|-----------|--------|------------|
+| S01 | B10 | 2026-01-05 |
+| S01 | B20 | 2026-01-12 |
+| S02 | B10 | 2026-01-08 |
 
-Now changing Alice's name means updating **one cell** in the Students table — not two rows.
+The Borrows table keeps `(StudentID, BookID)` as its composite key — that part didn't change. What changed is that `StudentName` and `BookTitle` moved out to tables where they depend on the *whole* key. Now changing Alice's name means updating **one cell** in the Students table — not every row she appears in.
 
 ---
 
 #### Rule 3 (3NF): No Chain Dependencies — "The Phone Directory Principle"
 
-**The Problem:**
+**The Problem:** It turns out every student also belongs to a department, and we've been storing that on the Students table too:
 
-| Employee ID | Employee Name | Department Code | Department Name | Department Manager |
-|-----------|-------------|-----------------|-----------------|-------------------|
-| E001 | Alice | D10 | Sales | John Smith |
-| E002 | Bob | D10 | Sales | John Smith |
-| E003 | Carol | D20 | Marketing | Jane Doe |
+| StudentID | StudentName | DepartmentCode | DepartmentName | DepartmentHead |
+|-----------|-------------|-----------------|-----------------|-----------------|
+| S01 | Alice | D10 | Engineering | Dr. Tan |
+| S02 | Bob | D10 | Engineering | Dr. Tan |
+| S03 | Carol | D20 | Arts | Dr. Lee |
 
-**What's wrong?** Look at Alice's row. It's supposed to be about *Alice* — but it also carries facts about her *department*: the department's name and its manager. Those facts aren't really about Alice; they got dragged along for the ride because Alice happens to work in Sales. The cost shows up the moment something changes: if the Sales manager changes from John Smith to someone new, you'd have to edit the row of **every single Sales employee**. The fix is to give departments their own table, so each department fact is written down exactly once.
+**What's wrong?** Look at Alice's row. It's supposed to be about *Alice* — but it also carries facts about her *department*: the department's name and its head. Those facts aren't really about Alice; they got dragged along for the ride because Alice happens to be in Engineering. The cost shows up the moment something changes: if Engineering gets a new head, you'd have to edit the row of **every single Engineering student**. The fix is to give departments their own table, so each department fact is written down exactly once.
 
 *(The formal name for "a fact that got dragged along" is a **transitive dependency** — the instinct matters more than the term.)*
 
 In arrow notation, the chain looks like this:
 
 ```
-Employee ID → Department Code → Department Name
-Employee ID → Department Code → Department Manager
+StudentID → DepartmentCode → DepartmentName
+StudentID → DepartmentCode → DepartmentHead
 ```
 
-**The Solution:** Split into Employees and Departments tables. When the Sales manager changes, you update ONE cell.
+**The Solution:** Split into Students and Departments tables. When Engineering gets a new head, you update ONE cell:
+
+| StudentID | StudentName | DepartmentCode |
+|-----------|-------------|-----------------|
+| S01 | Alice | D10 |
+| S02 | Bob | D10 |
+| S03 | Carol | D20 |
+
+| DepartmentCode | DepartmentName | DepartmentHead |
+|-----------------|-----------------|-----------------|
+| D10 | Engineering | Dr. Tan |
+| D20 | Arts | Dr. Lee |
+
+Put all three rules together and the original Library Borrow Log ends up as **4 clean tables**: Students, Departments, Books, and Borrows — each fact living in exactly one place.
+
+> **2NF vs 3NF — what's actually different?** 2NF is about a column depending on only *part* of a multi-column key (`StudentName` only cared about `StudentID`, not the full `StudentID + BookID` pair). 3NF is about a column depending on *another non-key column* instead of the key at all (`DepartmentName` depends on `DepartmentCode`, which isn't the key) — this can happen even with a single-column key like `StudentID`. Same instinct — "don't drag along facts that aren't really about the key" — but 2NF is a *key-shape* problem and 3NF is a *dependency-chain* problem.
 
 ---
 
