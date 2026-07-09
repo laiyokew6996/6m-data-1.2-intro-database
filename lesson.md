@@ -90,7 +90,7 @@ Before we write SQL queries, we need a map. An Architect draws a blueprint befor
 
 ![Drawing an ERD in dbdiagram.io](./assets/dbdiagram.gif)
 
-The glue that holds this blueprint together is the **ID**.
+The glue that holds this blueprint together is the **KEY**.
 
 **The Keys:**
 
